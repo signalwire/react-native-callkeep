@@ -40,6 +40,7 @@ import android.os.Bundle;
 import android.os.HandlerThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -282,6 +283,7 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
          }
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     private class CallStateListener extends TelephonyCallback implements TelephonyCallback.CallStateListener {
 
           @Override
