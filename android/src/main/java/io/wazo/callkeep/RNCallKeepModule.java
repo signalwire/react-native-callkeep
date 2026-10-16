@@ -844,6 +844,8 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
         try {
             VoiceConnection conn = (VoiceConnection) VoiceConnectionService.getConnection(uuid);
             if (conn == null) {
+                Log.w(TAG, "[RNCallKeepModule] setAudioRoute ignored because no connection found, uuid: " + uuid);
+                promise.reject("E_NO_CONNECTION", "No connection for uuid " + uuid);
                 return;
             }
             if(audioRoute.equals("Bluetooth")) {
