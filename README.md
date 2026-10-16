@@ -156,6 +156,8 @@ Alternative on iOS you can perform setup in `AppDelegate.m`. Doing this allows c
       - `displayCallReachabilityTimeout`: number in ms (optional)
         If provided, starts a timeout that checks if the application is reachable and ends the call if not (Default: null)
         You'll have to call `setReachable()` as soon as your Javascript application is started.
+    - `endCallsOnHostDestroy`: boolean (optional, default `true`)
+      When the React activity is destroyed (for example Back on the root screen), end every call; each sends `endCall` so the app can hang up its own leg. Set it to `false` to keep calls running without the activity (Telecom keeps a self-managed call; show an ongoing-call notification so the user can return). The process is not killed either way.
       
 `setup` calls internally `registerPhoneAccount`, `registerEvents` and `setSettings`.
 

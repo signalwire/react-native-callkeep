@@ -755,12 +755,23 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
 
    }
 
+   /**
+    * The React activity is gone (Back on the root screen, finish(), "Don't keep
+    * activities"). Telecom keeps a self-managed call without an activity, so
+    * ending the calls is a choice: setup({ android: { endCallsOnHostDestroy: false } })
+    * keeps them. When they end, each sends endCall to JS, so the app hangs up its
+    * own leg. The process is never killed here: a kill right after onDisconnect()
+    * dropped that endCall before it reached JS (upstream #724, #797).
+    */
    @Override
    public void onHostDestroy() {
-       // When activity destroyed end all calls
        Log.d(TAG, "[RNCallKeepModule] onHostDestroy called");
        if (!isConnectionServiceAvailable() || !hasPhoneAccount()) {
            Log.w(TAG, "[RNCallKeepModule] onHostDestroy ignored due to no ConnectionService or no phone account");
+           return;
+       }
+       if (!CallKeepSettings.endCallsOnHostDestroy(endCallsOnHostDestroySetting())) {
+           Log.d(TAG, "[RNCallKeepModule] onHostDestroy: calls kept (endCallsOnHostDestroy: false)");
            return;
        }
 
@@ -771,9 +782,19 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
            connectionToEnd.onDisconnect();
        }
        this.stopListenToNativeCallsState();
-       Log.d(TAG, "[RNCallKeepModule] onHostDestroy executed");
-       // This line will kill the android process after ending all calls
-       android.os.Process.killProcess(android.os.Process.myPid());
+       Log.d(TAG, "[RNCallKeepModule] onHostDestroy executed, ended " + connections.size() + " call(s)");
+   }
+
+   @Nullable
+   private static Boolean endCallsOnHostDestroySetting() {
+       try {
+           if (_settings != null && _settings.hasKey("endCallsOnHostDestroy")) {
+               return _settings.getBoolean("endCallsOnHostDestroy");
+           }
+       } catch (Exception e) {
+           Log.w(TAG, "[RNCallKeepModule] endCallsOnHostDestroy setting unreadable: " + e);
+       }
+       return null;
    }
 
     @ReactMethod
