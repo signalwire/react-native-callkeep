@@ -136,6 +136,8 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
     private boolean isReceiverRegistered = false;
     private VoiceBroadcastReceiver voiceBroadcastReceiver;
     private static WritableMap _settings;
+    /** The last registerPhoneAccount result: null before the first one, false if Telecom refused it. */
+    @Nullable private static Boolean phoneAccountRegistered;
     // WritableNativeArray caches its Java-side contents on the first read.
     // Keep the mutable queue in Java and create a fresh native snapshot for
     // each bridge delivery (including repeated getInitialEvents calls).
@@ -1318,7 +1320,7 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
 
         final TelecomManager telecom = telecomManager;
         final PhoneAccountHandle accountHandle = handle;
-        PhoneAccountRegistration.register(new PhoneAccountRegistration.Registrar<PhoneAccount>() {
+        phoneAccountRegistered = PhoneAccountRegistration.register(new PhoneAccountRegistration.Registrar<PhoneAccount>() {
             @Override
             public void register(PhoneAccount phoneAccount) {
                 telecom.registerPhoneAccount(phoneAccount);
@@ -1374,7 +1376,7 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
         }
 
         if (isSelfManaged()) {
-            return true;
+            return isConnectionServiceAvailable() && PhoneAccountRegistration.selfManagedAccountAvailable(phoneAccountRegistered);
         }
 
         if (!isConnectionServiceAvailable() || telecomManager == null || !hasPermissions()) {

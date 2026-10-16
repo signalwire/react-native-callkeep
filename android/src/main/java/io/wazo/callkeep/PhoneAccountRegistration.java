@@ -68,4 +68,14 @@ final class PhoneAccountRegistration {
             return false;
         }
     }
+
+    /**
+     * hasPhoneAccount() in self-managed mode, where the account is not read
+     * back from Telecom (that needs a phone permission): available unless
+     * Telecom refused the registration (#761). {@code registered} is null
+     * before the first registration.
+     */
+    static boolean selfManagedAccountAvailable(Boolean registered) {
+        return registered == null || registered;
+    }
 }

@@ -72,6 +72,12 @@ public class PhoneAccountRegistrationTest {
         eq(false, PhoneAccountRegistration.register(new FakeTelecom(new SecurityException("not voice capable")), "x", WARN),
                 "security exception");
         eq(6, warnings.size(), "every failure is reported");
+
+        // #761: in self-managed mode hasPhoneAccount() was always true, even where
+        // Telecom refused the account; it is false once a registration was refused.
+        eq(true, PhoneAccountRegistration.selfManagedAccountAvailable(null), "not registered yet");
+        eq(true, PhoneAccountRegistration.selfManagedAccountAvailable(true), "registered");
+        eq(false, PhoneAccountRegistration.selfManagedAccountAvailable(false), "refused");
         System.out.println("PhoneAccountRegistrationTest: ok");
     }
 }
