@@ -832,11 +832,7 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
             Log.w(TAG, "[RNCallKeepModule] toggleAudioRouteSpeaker ignored because no connection found, uuid: " + uuid);
             return;
         }
-        if (routeSpeaker) {
-            conn.setAudioRoute(CallAudioState.ROUTE_SPEAKER);
-        } else {
-            conn.setAudioRoute(CallAudioState.ROUTE_EARPIECE);
-        }
+        conn.setAudioRoute(AudioRoutes.speakerRoute(routeSpeaker));
     }
 
     @ReactMethod
