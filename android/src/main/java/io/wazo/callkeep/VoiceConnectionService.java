@@ -74,6 +74,7 @@ import static io.wazo.callkeep.Constants.EXTRA_SELF_MANAGED;
 import static io.wazo.callkeep.Constants.EXTRA_DISABLE_ADD_CALL;
 import static io.wazo.callkeep.Constants.FOREGROUND_SERVICE_TYPE_MICROPHONE;
 import static io.wazo.callkeep.Constants.ACTION_ON_CREATE_CONNECTION_FAILED;
+import static io.wazo.callkeep.Constants.ACTION_ON_CALL_ACTION_FAILED;
 
 // @see https://github.com/kbagchiGWC/voice-quickstart-android/blob/9a2aff7fbe0d0a5ae9457b48e9ad408740dfb968/exampleConnectionService/src/main/java/com/twilio/voice/examples/connectionservice/VoiceConnectionService.java
 @TargetApi(Build.VERSION_CODES.M)
@@ -542,6 +543,23 @@ public class VoiceConnectionService extends ConnectionService {
         }
 
         sendCallRequestToActivity(ACTION_ON_CREATE_CONNECTION_FAILED, extrasMap, true);
+    }
+
+    /**
+     * Telecom refused the outgoing call (another app's call in progress, the
+     * system's call limit). Without this the app never learned it: its own
+     * leg stayed up with no connection. Reported as didFailCallAction.
+     */
+    @Override
+    public void onCreateOutgoingConnectionFailed(PhoneAccountHandle connectionManagerPhoneAccount, ConnectionRequest request) {
+        super.onCreateOutgoingConnectionFailed(connectionManagerPhoneAccount, request);
+        Log.w(TAG, "[VoiceConnectionService] onCreateOutgoingConnectionFailed: " + request);
+        VoiceConnectionService.hasOutgoingCall = false;
+
+        Bundle extras = request.getExtras();
+        HashMap<String, String> extrasMap = extras == null ? new HashMap<String, String>() : this.bundleToMap(extras);
+        extrasMap.put("failedAction", "startCall");
+        sendCallRequestToActivity(ACTION_ON_CALL_ACTION_FAILED, extrasMap, true);
     }
 
     // When a listener is available for `sendCallRequestToActivity`, send delayed events.

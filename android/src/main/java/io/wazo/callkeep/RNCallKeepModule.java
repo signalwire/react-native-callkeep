@@ -106,6 +106,7 @@ import static io.wazo.callkeep.Constants.ACTION_WAKE_APP;
 import static io.wazo.callkeep.Constants.ACTION_SHOW_INCOMING_CALL_UI;
 import static io.wazo.callkeep.Constants.ACTION_ON_SILENCE_INCOMING_CALL;
 import static io.wazo.callkeep.Constants.ACTION_ON_CREATE_CONNECTION_FAILED;
+import static io.wazo.callkeep.Constants.ACTION_ON_CALL_ACTION_FAILED;
 import static io.wazo.callkeep.Constants.ACTION_DID_CHANGE_AUDIO_ROUTE;
 
 // @see https://github.com/kbagchiGWC/voice-quickstart-android/blob/9a2aff7fbe0d0a5ae9457b48e9ad408740dfb968/exampleConnectionService/src/main/java/com/twilio/voice/examples/connectionservice/VoiceConnectionServiceActivity.java
@@ -1445,6 +1446,7 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
             intentFilter.addAction(ACTION_SHOW_INCOMING_CALL_UI);
             intentFilter.addAction(ACTION_ON_SILENCE_INCOMING_CALL);
             intentFilter.addAction(ACTION_ON_CREATE_CONNECTION_FAILED);
+            intentFilter.addAction(ACTION_ON_CALL_ACTION_FAILED);
             intentFilter.addAction(ACTION_DID_CHANGE_AUDIO_ROUTE);
 
             if (this.reactContext != null) {
@@ -1584,6 +1586,14 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
                     args.putString("callUUID", attributeMap.get(EXTRA_CALL_UUID));
                     args.putString("name", attributeMap.get(EXTRA_CALLER_NAME));
                     sendEventToJS("RNCallKeepOnSilenceIncomingCall", args);
+                    break;
+                case ACTION_ON_CALL_ACTION_FAILED:
+                    String failedUuid = attributeMap.get(EXTRA_CALL_UUID);
+                    args.putString("callUUID", failedUuid == null ? "" : failedUuid);
+                    args.putString("action", attributeMap.get("failedAction"));
+                    args.putString("errorCode", "ConnectionRefused");
+                    args.putString("error", "Telecom refused the outgoing connection");
+                    sendEventToJS("RNCallKeepDidFailCallAction", args);
                     break;
                 case ACTION_ON_CREATE_CONNECTION_FAILED:
                     args.putString("handle", attributeMap.get(EXTRA_CALL_NUMBER));

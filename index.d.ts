@@ -66,7 +66,7 @@ declare module 'react-native-callkeep' {
     didFailCallAction: {
       callUUID: string,
       action: 'startCall' | 'answerCall' | 'endCall' | 'setHeld' | 'setMuted' | 'playDTMF' | 'unknown',
-      errorCode: 'Unentitled' | 'UnknownCallProvider' | 'EmptyTransaction' | 'UnknownCallUUID' | 'CallUUIDAlreadyExists' | 'InvalidAction' | 'MaximumCallGroupsReached' | 'CallIsProtected' | 'Unknown',
+      errorCode: 'Unentitled' | 'UnknownCallProvider' | 'EmptyTransaction' | 'UnknownCallUUID' | 'CallUUIDAlreadyExists' | 'InvalidAction' | 'MaximumCallGroupsReached' | 'CallIsProtected' | 'ConnectionRefused' | 'Unknown',
       error: string,
     };
   }

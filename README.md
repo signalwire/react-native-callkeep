@@ -787,7 +787,7 @@ RNCallKeep.registerAndroidEvents();
 | [checkReachability](#checkReachability)                         |  ❌  |   ✅    |
 | [didChangeAudioRoute](#didChangeAudioRoute)                     |  ✅  |   ✅    |
 | [onHasActiveCall](#onHasActiveCall)                             |  ❌  |   ✅    |
-| [didFailCallAction](#didFailCallAction)                         |  ✅  |   ❌    |
+| [didFailCallAction](#didFailCallAction)                         |  ✅  |   ✅    |
 
 ### didReceiveStartCallAction
 
@@ -961,7 +961,9 @@ RNCallKeep.addEventListener('didFailCallAction', ({ callUUID, action, errorCode,
 - `error` (string)
   - The error's localized description.
 
-iOS only. One sent before JavaScript is listening is replayed in `didLoadWithEvents`, like the other events.
+On Android it is sent for `startCall` only, when Telecom refuses the outgoing connection (`onCreateOutgoingConnectionFailed`), with `errorCode: 'ConnectionRefused'`. Telecom gives no reason.
+
+One sent before JavaScript is listening is replayed in `didLoadWithEvents`, like the other events.
 
 ### didLoadWithEvents
 
