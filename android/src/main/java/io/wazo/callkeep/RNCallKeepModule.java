@@ -1316,7 +1316,13 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
 
         telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
-        telecomManager.registerPhoneAccount(account);
+        try {
+            telecomManager.registerPhoneAccount(account);
+        } catch (UnsupportedOperationException | SecurityException | IllegalArgumentException e) {
+            // No android.software.telecom (some tablets), or an account Telecom refuses:
+            // leave it unregistered rather than crash setup() (#815, #761).
+            Log.w(TAG, "[RNCallKeepModule] registerPhoneAccount failed: " + e);
+        }
     }
 
     public void sendEventToJS(String eventName, @Nullable WritableMap params) {
@@ -1365,9 +1371,16 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
             return true;
         }
 
-        return isConnectionServiceAvailable() && telecomManager != null &&
-            hasPermissions() && telecomManager.getPhoneAccount(handle) != null &&
-            telecomManager.getPhoneAccount(handle).isEnabled();
+        if (!isConnectionServiceAvailable() || telecomManager == null || !hasPermissions()) {
+            return false;
+        }
+        try {
+            PhoneAccount account = telecomManager.getPhoneAccount(handle);
+            return account != null && account.isEnabled();
+        } catch (UnsupportedOperationException | SecurityException e) {
+            Log.w(TAG, "[RNCallKeepModule] getPhoneAccount failed: " + e);
+            return false;
+        }
     }
 
     /**
