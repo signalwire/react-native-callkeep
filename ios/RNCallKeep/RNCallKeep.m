@@ -538,6 +538,7 @@ RCT_EXPORT_METHOD(setAudioRoute: (NSString *)uuid
                 return;
             }
         }
+        reject(@"E_NO_AUDIO_ROUTE", [NSString stringWithFormat:@"No audio input named %@", inputName], nil);
     }
     @catch ( NSException *e ){
         NSLog(@"[RNCallKeep][setAudioRoute] exception: %@",e);
