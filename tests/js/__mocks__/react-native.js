@@ -29,7 +29,7 @@ const RNCallKeep = new Proxy(
   }
 );
 
-const Platform = { OS: process.env.CALLKEEP_TEST_OS || 'android', Version: 35 };
+const Platform = { OS: 'android', Version: 35 };
 
 module.exports = {
   NativeModules: { RNCallKeep },

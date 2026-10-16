@@ -44,6 +44,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.telecom.CallAudioState;
+import android.telecom.CallEndpoint;
+import android.telecom.CallEndpointException;
+import android.os.OutcomeReceiver;
 import android.telecom.Connection;
 import android.telecom.DisconnectCause;
 import android.telecom.PhoneAccount;
@@ -870,6 +873,80 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
         } catch (Exception e) {
             promise.reject("SetAudioRoute", e.getMessage());
         }
+    }
+
+    /**
+     * Routes the call to one Bluetooth device, by address (from getAudioRoutes or
+     * didChangeAudioRoute). API 34+: requestCallEndpointChange with the device's
+     * endpoint; API 28-33 (or no matching endpoint): requestBluetoothAudio; older:
+     * the Bluetooth route (Telecom picks the device).
+     */
+    @ReactMethod
+    public void setAudioRouteBluetoothDevice(String uuid, String address, Promise promise) {
+        VoiceConnection conn = (VoiceConnection) VoiceConnectionService.getConnection(uuid);
+        if (conn == null) {
+            promise.reject("E_NO_CONNECTION", "No connection for uuid " + uuid);
+            return;
+        }
+        try {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                conn.setAudioRoute(CallAudioState.ROUTE_BLUETOOTH);
+                promise.resolve(true);
+                return;
+            }
+            CallAudioState state = conn.getCallAudioState();
+            BluetoothDevice device = null;
+            if (state != null) {
+                for (BluetoothDevice candidate : state.getSupportedBluetoothDevices()) {
+                    if (candidate.getAddress().equalsIgnoreCase(address)) {
+                        device = candidate;
+                    }
+                }
+            }
+            if (device == null) {
+                promise.reject("E_NO_BLUETOOTH_DEVICE", "Telecom offers this call no Bluetooth device " + address);
+                return;
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                CallEndpoint endpoint = bluetoothEndpointFor(conn, device, state.getSupportedBluetoothDevices().size());
+                if (endpoint != null) {
+                    Log.d(TAG, "[RNCallKeepModule] setAudioRouteBluetoothDevice: requestCallEndpointChange " + endpoint);
+                    conn.requestCallEndpointChange(endpoint, ContextCompat.getMainExecutor(reactContext),
+                            new OutcomeReceiver<Void, CallEndpointException>() {
+                                @Override
+                                public void onResult(Void result) {
+                                    promise.resolve(true);
+                                }
+
+                                @Override
+                                public void onError(CallEndpointException error) {
+                                    promise.reject("E_CALL_ENDPOINT", error.getMessage(), error);
+                                }
+                            });
+                    return;
+                }
+            }
+            Log.d(TAG, "[RNCallKeepModule] setAudioRouteBluetoothDevice: requestBluetoothAudio");
+            conn.requestBluetoothAudio(device);
+            promise.resolve(true);
+        } catch (Exception e) {
+            promise.reject("E_SET_BLUETOOTH_DEVICE", e.getMessage(), e);
+        }
+    }
+
+    /** The endpoint for a device: by name, or the only one when the call has a single Bluetooth device. */
+    @Nullable
+    private static CallEndpoint bluetoothEndpointFor(VoiceConnection conn, BluetoothDevice device, int deviceCount) {
+        List<CallEndpoint> endpoints = conn.getBluetoothEndpoints();
+        String name = bluetoothDeviceName(device);
+        if (name != null) {
+            for (CallEndpoint endpoint : endpoints) {
+                if (name.contentEquals(endpoint.getEndpointName())) {
+                    return endpoint;
+                }
+            }
+        }
+        return endpoints.size() == 1 && deviceCount == 1 ? endpoints.get(0) : null;
     }
 
     @ReactMethod

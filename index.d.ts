@@ -250,6 +250,12 @@ declare module 'react-native-callkeep' {
     static setAudioRoute: (uuid: string, inputName: string) => Promise<void>
 
     /**
+     * @description Android only: route the call to one Bluetooth device, by the address
+     * from getAudioRoutes() or didChangeAudioRoute. Rejects on iOS (use setAudioRoute with the port name).
+     */
+    static setAudioRouteBluetoothDevice(uuid: string, address: string): Promise<boolean>
+
+    /**
      * @description supportConnectionService method is available only on Android.
      */
     static supportConnectionService(): boolean

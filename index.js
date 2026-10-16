@@ -255,6 +255,11 @@ class RNCallKeep {
 
   setAudioRoute = (uuid, inputName) => RNCallKeepModule.setAudioRoute(uuid, inputName);
 
+  setAudioRouteBluetoothDevice = (uuid, address) =>
+    isIOS
+      ? Promise.reject(new Error('setAudioRouteBluetoothDevice is Android only; on iOS pass the port name to setAudioRoute'))
+      : RNCallKeepModule.setAudioRouteBluetoothDevice(uuid, address);
+
   checkIfBusy = () =>
     isIOS ? RNCallKeepModule.checkIfBusy() : Promise.reject('RNCallKeep.checkIfBusy was called from unsupported OS');
 

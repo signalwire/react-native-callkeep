@@ -236,6 +236,7 @@ Self Managed calling apps are an advanced topic, and there are many steps involv
 | [checkIfBusy()](#checkIfBusy)                                     | `Promise<Boolean>`  |  ✅  |   ❌    |
 | [checkSpeaker()](#checkSpeaker)                                   | `Promise<Boolean>`  |  ✅  |   ❌    |
 | [toggleAudioRouteSpeaker()](#toggleAudioRouteSpeaker)             | `Promise<void>`     |  ❌  |   ✅    |
+| [setAudioRouteBluetoothDevice()](#setAudioRouteBluetoothDevice)   | `Promise<boolean>`  |  ❌  |   ✅    |
 | [supportConnectionService()](#supportConnectionService)           | `Promise<Boolean>`  |  ❌  |   ✅    |
 | [hasPhoneAccount()](#hasPhoneAccount)                             | `Promise<Boolean>`  |  ❌  |   ✅    |
 | [hasOutgoingCall()](#hasOutgoingCall)                             | `Promise<Boolean>`  |  ❌  |   ✅    |
@@ -615,6 +616,25 @@ Set audio route using a route from `getAudioRoutes`.
 
 ```js
 await RNCallKeep.setAudioRoute(uuid, routeName);
+```
+
+The promise rejects with `E_NO_CONNECTION` (Android) when there is no call
+for `uuid`, and with `E_NO_AUDIO_ROUTE` (iOS) when no input has that name.
+
+### setAudioRouteBluetoothDevice
+
+_This feature is available only on Android._
+
+Route the call to one Bluetooth device, by its `address` from
+`getAudioRoutes()` or `didChangeAudioRoute`. Android 14+ uses
+`Connection.requestCallEndpointChange` with the device's call endpoint,
+Android 9-13 `Connection.requestBluetoothAudio`; older versions switch to the
+Bluetooth route and Telecom picks the device. Rejects with `E_NO_CONNECTION`,
+`E_NO_BLUETOOTH_DEVICE` (Telecom does not offer that device to the call) or
+`E_CALL_ENDPOINT` (Telecom refused the change).
+
+```js
+await RNCallKeep.setAudioRouteBluetoothDevice(uuid, address);
 ```
 
 - `uuid`: string

@@ -26,6 +26,7 @@ import android.os.Handler;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.telecom.CallAudioState;
+import android.telecom.CallEndpoint;
 import android.telecom.Connection;
 import android.telecom.DisconnectCause;
 import android.telecom.TelecomManager;
@@ -35,7 +36,10 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import static io.wazo.callkeep.Constants.ACTION_ANSWER_CALL;
 import static io.wazo.callkeep.Constants.ACTION_AUDIO_SESSION;
@@ -59,6 +63,8 @@ public class VoiceConnection extends Connection {
     private boolean answered = false;
     private boolean rejected = false;
     private HashMap<String, String> handle;
+    // API 34+: the call endpoints Telecom offers this call, for picking a Bluetooth device.
+    private volatile List<CallEndpoint> availableEndpoints = Collections.emptyList();
     private Context context;
     private static final String TAG = "RNCallKeep";
 
@@ -102,6 +108,24 @@ public class VoiceConnection extends Connection {
 
         this.isMuted = state.isMuted();
         sendCallRequestToActivity(isMuted ? ACTION_MUTE_CALL : ACTION_UNMUTE_CALL, handle);
+    }
+
+    @Override
+    public void onAvailableCallEndpointsChanged(List<CallEndpoint> endpoints) {
+        super.onAvailableCallEndpointsChanged(endpoints);
+        availableEndpoints = endpoints == null ? Collections.<CallEndpoint>emptyList() : new ArrayList<>(endpoints);
+        Log.d(TAG, "[VoiceConnection] onAvailableCallEndpointsChanged: " + availableEndpoints.size());
+    }
+
+    /** API 34+: the call's Bluetooth endpoints Telecom offers. */
+    List<CallEndpoint> getBluetoothEndpoints() {
+        List<CallEndpoint> bluetooth = new ArrayList<>();
+        for (CallEndpoint endpoint : availableEndpoints) {
+            if (endpoint.getEndpointType() == CallEndpoint.TYPE_BLUETOOTH) {
+                bluetooth.add(endpoint);
+            }
+        }
+        return bluetooth;
     }
 
     @Override

@@ -21,3 +21,11 @@ describe('audio routes (Android)', () => {
     expect(native.toggleAudioRouteSpeaker).toHaveBeenCalledWith('u1', false);
   });
 });
+
+describe('setAudioRouteBluetoothDevice', () => {
+  it('forwards the uuid and the device address on Android', async () => {
+    native.setAudioRouteBluetoothDevice.mockReturnValueOnce(Promise.resolve(true));
+    await expect(RNCallKeep.setAudioRouteBluetoothDevice('u1', 'AA:BB:CC:DD:EE:FF')).resolves.toBe(true);
+    expect(native.setAudioRouteBluetoothDevice).toHaveBeenCalledWith('u1', 'AA:BB:CC:DD:EE:FF');
+  });
+});
