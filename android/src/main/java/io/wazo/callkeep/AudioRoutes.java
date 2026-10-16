@@ -58,6 +58,17 @@ final class AudioRoutes {
         }
     }
 
+    /** getAudioRoutes()'s type (and name) for a route; null for a route it does not list (streaming). */
+    static String callKeepType(int route) {
+        switch (route) {
+            case CallAudioState.ROUTE_EARPIECE: return "Phone";
+            case CallAudioState.ROUTE_BLUETOOTH: return "Bluetooth";
+            case CallAudioState.ROUTE_WIRED_HEADSET: return "Headset";
+            case CallAudioState.ROUTE_SPEAKER: return "Speaker";
+            default: return null;
+        }
+    }
+
     /** The names of the routes in a mask (a CallAudioState's supported route mask). */
     static List<String> routeNames(int mask) {
         List<String> names = new ArrayList<>();

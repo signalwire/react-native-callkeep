@@ -82,7 +82,11 @@ declare module 'react-native-callkeep' {
   export type AudioRoute = {
     name: string,
     type: string,
-    selected?: boolean
+    selected?: boolean,
+    /** Android 9+: one Bluetooth entry per device, with its address (for setAudioRouteBluetoothDevice) and name. */
+    address?: string,
+    /** null without BLUETOOTH_CONNECT (Android 12+). */
+    deviceName?: string | null,
   }
 
   export enum AudioSessionCategoryOption {
@@ -241,7 +245,7 @@ declare module 'react-native-callkeep' {
       outgoing: boolean
     }[] | void>
 
-    static getAudioRoutes(): Promise<void>
+    static getAudioRoutes(): Promise<AudioRoute[]>
 
     static setAudioRoute: (uuid: string, inputName: string) => Promise<void>
 

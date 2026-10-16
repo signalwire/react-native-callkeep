@@ -875,6 +875,11 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
     @ReactMethod
     public void getAudioRoutes(Promise promise){
         try {
+            CallAudioState callAudioState = currentCallAudioState();
+            if (callAudioState != null) {
+                promise.resolve(audioRoutesOf(callAudioState));
+                return;
+            }
             Context context = this.getAppContext();
             if (context == null) {
                 Log.w(TAG, "[RNCallKeepModule][getAudioRoutes] no react context found.");
@@ -903,6 +908,62 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
         } catch(Exception e) {
             promise.reject("GetAudioRoutes Error", e.getMessage());
         }
+    }
+
+    /** The audio state of the active call, else of any call; null when there is no call. */
+    @Nullable
+    private static CallAudioState currentCallAudioState() {
+        CallAudioState any = null;
+        for (VoiceConnection connection : new ArrayList<>(VoiceConnectionService.currentConnections.values())) {
+            CallAudioState state = connection.getCallAudioState();
+            if (state == null) {
+                continue;
+            }
+            if (connection.getState() == Connection.STATE_ACTIVE) {
+                return state;
+            }
+            if (any == null) {
+                any = state;
+            }
+        }
+        return any;
+    }
+
+    /**
+     * The routes Telecom offers the call, as { name, type, selected }. From API 28
+     * each Bluetooth device is its own entry (name "Bluetooth", so setAudioRoute
+     * still takes it) with its address and deviceName.
+     */
+    private static WritableArray audioRoutesOf(CallAudioState state) {
+        WritableArray routes = Arguments.createArray();
+        for (int route : AudioRoutes.routes(state.getSupportedRouteMask())) {
+            String type = AudioRoutes.callKeepType(route);
+            if (type == null) {
+                continue;
+            }
+            boolean selected = state.getRoute() == route;
+            if (route == CallAudioState.ROUTE_BLUETOOTH && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
+                    && !state.getSupportedBluetoothDevices().isEmpty()) {
+                BluetoothDevice active = state.getActiveBluetoothDevice();
+                for (BluetoothDevice device : state.getSupportedBluetoothDevices()) {
+                    WritableMap entry = Arguments.createMap();
+                    entry.putString("name", type);
+                    entry.putString("deviceName", bluetoothDeviceName(device));
+                    entry.putString("address", device.getAddress());
+                    entry.putString("type", type);
+                    entry.putBoolean("selected", selected && active != null
+                            && device.getAddress().equals(active.getAddress()));
+                    routes.pushMap(entry);
+                }
+                continue;
+            }
+            WritableMap entry = Arguments.createMap();
+            entry.putString("name", type);
+            entry.putString("type", type);
+            entry.putBoolean("selected", selected);
+            routes.pushMap(entry);
+        }
+        return routes;
     }
 
     private String getAudioRouteType(int type){
@@ -1237,18 +1298,22 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
         args.putArray("bluetoothDevices", devices);
     }
 
-    /** name is null without BLUETOOTH_CONNECT (API 31+). */
     private static WritableMap bluetoothDeviceMap(BluetoothDevice device) {
         WritableMap map = Arguments.createMap();
         map.putString("address", device.getAddress());
-        String name = null;
+        map.putString("name", bluetoothDeviceName(device));
+        return map;
+    }
+
+    /** null without BLUETOOTH_CONNECT (API 31+). */
+    @Nullable
+    private static String bluetoothDeviceName(BluetoothDevice device) {
         try {
-            name = device.getName();
+            return device.getName();
         } catch (SecurityException e) {
             Log.d(TAG, "[RNCallKeepModule] Bluetooth device name needs BLUETOOTH_CONNECT");
+            return null;
         }
-        map.putString("name", name);
-        return map;
     }
 
     protected void registerReceiver() {

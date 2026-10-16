@@ -24,6 +24,12 @@ public class AudioRoutesTest {
         List<Integer> routes = AudioRoutes.routes(CallAudioState.ROUTE_SPEAKER | CallAudioState.ROUTE_WIRED_HEADSET);
         eq(Arrays.asList(CallAudioState.ROUTE_WIRED_HEADSET, CallAudioState.ROUTE_SPEAKER), routes, "route bits");
 
+        eq("Phone", AudioRoutes.callKeepType(CallAudioState.ROUTE_EARPIECE), "earpiece type");
+        eq("Speaker", AudioRoutes.callKeepType(CallAudioState.ROUTE_SPEAKER), "speaker type");
+        eq("Headset", AudioRoutes.callKeepType(CallAudioState.ROUTE_WIRED_HEADSET), "headset type");
+        eq("Bluetooth", AudioRoutes.callKeepType(CallAudioState.ROUTE_BLUETOOTH), "bluetooth type");
+        eq(null, AudioRoutes.callKeepType(CallAudioState.ROUTE_STREAMING), "streaming has no callkeep type");
+
         eq(CallAudioState.ROUTE_SPEAKER, AudioRoutes.speakerRoute(true), "speaker on");
         eq(CallAudioState.ROUTE_WIRED_OR_EARPIECE, AudioRoutes.speakerRoute(false),
                 "speaker off goes to the headset or the earpiece, as setAudioRoute does");

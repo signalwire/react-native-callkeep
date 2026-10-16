@@ -595,9 +595,19 @@ await RNCallKeep.getAudioRoutes(): AudioRoute;
 ```
 type AudioRoute = {
     name: string,
-    type: string
+    type: string,
+    selected?: boolean,
+    address?: string,           // Android 9+, Bluetooth entries
+    deviceName?: string | null, // Android 9+, Bluetooth entries
 }
 ```
+
+On Android, during a call the list is the routes Telecom offers that call
+(its `CallAudioState`), and `selected` is the call's current route. From
+Android 9 each Bluetooth device is its own entry (`name: 'Bluetooth'`, with
+its `address` and `deviceName`; `deviceName` is `null` without the
+`BLUETOOTH_CONNECT` permission). With no call it lists the devices
+`AudioManager` reports.
 
 ### setAudioRoute
 
