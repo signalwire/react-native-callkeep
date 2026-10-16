@@ -11,6 +11,15 @@ Fixes for open upstream issues and pull requests, on top of 4.4.0-signalwire.0.
 - Android: switching `selfManaged` off after a self-managed phone account was registered works: Telecom refuses to change the account's kind (`IllegalArgumentException: cannot change a self-managed phone account ... to other kinds of phone account`, which crashed `setup()` upstream and left the old account in 4.4.0-signalwire.0), so callkeep unregisters it and registers the new one ([#722](https://github.com/react-native-webrtc/react-native-callkeep/issues/722)).
 - Android: in self-managed mode `hasPhoneAccount()`/`checkPhoneAccountEnabled()` return false when Telecom refused the phone account (devices without `android.software.telecom`, non-voice-capable tablets); they always returned true ([#761](https://github.com/react-native-webrtc/react-native-callkeep/issues/761)).
 
+### Open upstream pull requests taken
+
+- Android: `@RequiresApi(S)` on the `TelephonyCallback` listener, which only exists from API 31 ([#741](https://github.com/react-native-webrtc/react-native-callkeep/pull/741), Rami Jarrar; cherry-picked).
+- iOS: a privacy manifest (`RNCallKeepPrivacyInfo` resource bundle) declaring the `NSUserDefaults` use (reason `CA92.1`); no collected data, no tracking ([#770](https://github.com/react-native-webrtc/react-native-callkeep/pull/770), ujeon; rewritten, its collected-data entry dropped).
+
+### Upstream issues already fixed by 4.4.0-signalwire.0
+
+- [#833](https://github.com/react-native-webrtc/react-native-callkeep/issues/833): clearing the app from Recents killed the process (and any other foreground service) through `onHostDestroy`'s `killProcess`; the fork no longer kills, and `endCallsOnHostDestroy: false` keeps the call. [#534](https://github.com/react-native-webrtc/react-native-callkeep/issues/534) (the call should end when the app is killed) is the default, `endCallsOnHostDestroy: true`.
+
 ### Behaviour changes
 
 - Android, self-managed: `hasPhoneAccount()` can now be false (only where Telecom refused the account; before the first registration it is still true).
