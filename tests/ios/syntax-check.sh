@@ -26,4 +26,5 @@ xcrun --sdk iphonesimulator clang -fsyntax-only -fobjc-arc -fmodules \
   -Werror=objc-method-access -Wno-nullability-completeness \
   -I "$work" -I "$rn/ReactCommon/yoga" -I "$root/ios/RNCallKeep" \
   "$root/ios/RNCallKeep/RNCallKeep.m"
+plutil -lint "$root/ios/PrivacyInfo.xcprivacy"
 echo "RNCallKeep.m type-checks ($(basename "$sdk"), react-native $(node -p "require('$rn/package.json').version"))"

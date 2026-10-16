@@ -14,5 +14,7 @@ Pod::Spec.new do |s|
   s.platform            = :ios, "8.0"
   s.source_files        = "ios/RNCallKeep/*.{h,m}"
   s.dependency 'React'
+  # NSUserDefaults (the stored settings) is a required-reason API.
+  s.resource_bundles    = { 'RNCallKeepPrivacyInfo' => ['ios/PrivacyInfo.xcprivacy'] }
 end
 
