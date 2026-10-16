@@ -3,3 +3,7 @@ node_modules/
 .idea/
 .github/
 docs/
+tests/
+jest.config.js
+babel.config.js
+.tmp/

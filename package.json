@@ -3,7 +3,11 @@
   "version": "4.3.17",
   "description": "iOS 10 CallKit and Android ConnectionService Framework For React Native",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "jest",
+    "test:android": "bash tests/android/compile.sh",
+    "test:ios": "bash tests/ios/syntax-check.sh"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/react-native-webrtc/react-native-callkeep.git"
@@ -25,7 +29,11 @@
     "react-native": ">=0.40.0"
   },
   "devDependencies": {
-    "react-native": ">=0.40.0"
+    "@babel/core": "^7.26.0",
+    "@babel/plugin-transform-class-properties": "^7.25.9",
+    "@babel/preset-env": "^7.26.0",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0"
   },
   "dependencies": {}
 }
