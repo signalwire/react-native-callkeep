@@ -1,5 +1,7 @@
 # React Native CallKeep
 
+> **Fork.** This branch (`signalwire/main` of mjerris/react-native-callkeep) is a maintained fork of [react-native-webrtc/react-native-callkeep](https://github.com/react-native-webrtc/react-native-callkeep), ISC-licensed by The CallKeep Authors. See [CHANGELOG.md](CHANGELOG.md) for what it adds.
+
 [![npm version](https://badge.fury.io/js/react-native-callkeep.svg)](https://badge.fury.io/js/react-native-callkeep)
 [![npm downloads](https://img.shields.io/npm/dm/react-native-callkeep.svg?maxAge=2592000)](https://img.shields.io/npm/dm/react-native-callkeep.svg?maxAge=2592000)
 
