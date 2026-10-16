@@ -25,6 +25,7 @@ public class Constants {
     public static final String EXTRA_HAS_VIDEO = "EXTRA_HAS_VIDEO";
     public static final String EXTRA_SELF_MANAGED = "EXTRA_SELF_MANAGED";
     public static final String EXTRA_PAYLOAD = "EXTRA_PAYLOAD";
+    public static final String EXTRA_CALL_AUDIO_STATE = "EXTRA_CALL_AUDIO_STATE";
     // Can't use telecom.EXTRA_DISABLE_ADD_CALL ...
     public static final String EXTRA_DISABLE_ADD_CALL = "android.telecom.extra.DISABLE_ADD_CALL";
 

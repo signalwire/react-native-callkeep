@@ -886,6 +886,9 @@ RNCallKeep.addEventListener('didChangeAudioRoute', ({ output }) => {
 - `reason` (number, iOS only) See case's in https://developer.apple.com/documentation/avfaudio/avaudiosession/routechangereason
 - `handle` (string, Android only) Phone number of the incoming caller
 - `callUUID` (string, Android only) The UUID of the call
+- `supportedRoutes` (string[], Android only) The routes Telecom offers the call: `EARPIECE`, `BLUETOOTH`, `WIRED_HEADSET`, `SPEAKER`, `STREAMING`
+- `bluetoothDevice` (`{ address, name }`, Android 9+ only) The call's active Bluetooth device, if any. `name` is `null` without the `BLUETOOTH_CONNECT` permission (Android 12+).
+- `bluetoothDevices` (`{ address, name }[]`, Android 9+ only) The Bluetooth devices Telecom can route the call to
 
 ### didPerformDTMFAction
 

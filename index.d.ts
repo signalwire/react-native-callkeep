@@ -48,6 +48,12 @@ declare module 'react-native-callkeep' {
       reason?: number,
       handle?: string,
       callUUID?: string,
+      /** Android: the routes Telecom offers this call. */
+      supportedRoutes?: Array<'EARPIECE' | 'BLUETOOTH' | 'WIRED_HEADSET' | 'SPEAKER' | 'STREAMING'>,
+      /** Android 9+: the call's active Bluetooth device, when the route is Bluetooth. */
+      bluetoothDevice?: BluetoothAudioDevice,
+      /** Android 9+: the Bluetooth devices Telecom can route this call to. */
+      bluetoothDevices?: BluetoothAudioDevice[],
     };
     didPerformDTMFAction: { digits: string, callUUID: string };
     showIncomingCallUi: { handle: string, callUUID: string, name: string };
@@ -66,6 +72,12 @@ declare module 'react-native-callkeep' {
   }
 
   type HandleType = 'generic' | 'number' | 'email';
+
+  /** `name` is null when the app lacks BLUETOOTH_CONNECT (Android 12+). */
+  export type BluetoothAudioDevice = {
+    address: string,
+    name: string | null,
+  }
 
   export type AudioRoute = {
     name: string,

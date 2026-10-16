@@ -51,6 +51,7 @@ import static io.wazo.callkeep.Constants.EXTRA_CALL_UUID;
 import static io.wazo.callkeep.Constants.ACTION_SHOW_INCOMING_CALL_UI;
 import static io.wazo.callkeep.Constants.ACTION_ON_SILENCE_INCOMING_CALL;
 import static io.wazo.callkeep.Constants.ACTION_DID_CHANGE_AUDIO_ROUTE;
+import static io.wazo.callkeep.Constants.EXTRA_CALL_AUDIO_STATE;
 
 @TargetApi(Build.VERSION_CODES.M)
 public class VoiceConnection extends Connection {
@@ -91,7 +92,9 @@ public class VoiceConnection extends Connection {
         Log.d(TAG, "[VoiceConnection] onCallAudioStateChanged muted :" + (state.isMuted() ? "true" : "false"));
 
         handle.put("output", CallAudioState.audioRouteToString(state.getRoute()));
-        sendCallRequestToActivity(ACTION_DID_CHANGE_AUDIO_ROUTE, handle);
+        Bundle routeExtras = new Bundle();
+        routeExtras.putParcelable(EXTRA_CALL_AUDIO_STATE, state);
+        sendCallRequestToActivity(ACTION_DID_CHANGE_AUDIO_ROUTE, handle, routeExtras);
 
         if (state.isMuted() == this.isMuted) {
             return;
@@ -341,6 +344,10 @@ public class VoiceConnection extends Connection {
      * Send call request to the RNCallKeepModule
      */
     private void sendCallRequestToActivity(final String action, @Nullable final HashMap attributeMap) {
+        sendCallRequestToActivity(action, attributeMap, null);
+    }
+
+    private void sendCallRequestToActivity(final String action, @Nullable final HashMap attributeMap, @Nullable final Bundle moreExtras) {
         final VoiceConnection instance = this;
         final Handler handler = new Handler();
 
@@ -352,6 +359,9 @@ public class VoiceConnection extends Connection {
                     Bundle extras = new Bundle();
                     extras.putSerializable("attributeMap", attributeMap);
                     intent.putExtras(extras);
+                }
+                if (moreExtras != null) {
+                    intent.putExtras(moreExtras);
                 }
                 LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
             }

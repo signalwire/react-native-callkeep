@@ -30,6 +30,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Icon;
+import android.bluetooth.BluetoothDevice;
 import android.media.AudioDeviceInfo;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -87,6 +88,7 @@ import static io.wazo.callkeep.Constants.EXTRA_CALL_NUMBER;
 import static io.wazo.callkeep.Constants.EXTRA_HAS_VIDEO;
 import static io.wazo.callkeep.Constants.EXTRA_SELF_MANAGED;
 import static io.wazo.callkeep.Constants.EXTRA_PAYLOAD;
+import static io.wazo.callkeep.Constants.EXTRA_CALL_AUDIO_STATE;
 import static io.wazo.callkeep.Constants.ACTION_END_CALL;
 import static io.wazo.callkeep.Constants.ACTION_ANSWER_CALL;
 import static io.wazo.callkeep.Constants.ACTION_MUTE_CALL;
@@ -1209,6 +1211,46 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
             telecomManager.getPhoneAccount(handle).isEnabled();
     }
 
+    /**
+     * The routes Telecom offers the call and, from API 28, its Bluetooth devices:
+     * supportedRoutes (Telecom's route names), bluetoothDevice (the active one)
+     * and bluetoothDevices.
+     */
+    private static void putAudioState(WritableMap args, CallAudioState state) {
+        WritableArray routes = Arguments.createArray();
+        for (String name : AudioRoutes.routeNames(state.getSupportedRouteMask())) {
+            routes.pushString(name);
+        }
+        args.putArray("supportedRoutes", routes);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            return;
+        }
+        BluetoothDevice active = state.getActiveBluetoothDevice();
+        if (active != null) {
+            args.putMap("bluetoothDevice", bluetoothDeviceMap(active));
+        }
+        WritableArray devices = Arguments.createArray();
+        for (BluetoothDevice device : state.getSupportedBluetoothDevices()) {
+            devices.pushMap(bluetoothDeviceMap(device));
+        }
+        args.putArray("bluetoothDevices", devices);
+    }
+
+    /** name is null without BLUETOOTH_CONNECT (API 31+). */
+    private static WritableMap bluetoothDeviceMap(BluetoothDevice device) {
+        WritableMap map = Arguments.createMap();
+        map.putString("address", device.getAddress());
+        String name = null;
+        try {
+            name = device.getName();
+        } catch (SecurityException e) {
+            Log.d(TAG, "[RNCallKeepModule] Bluetooth device name needs BLUETOOTH_CONNECT");
+        }
+        map.putString("name", name);
+        return map;
+    }
+
     protected void registerReceiver() {
         if (!isReceiverRegistered) {
             isReceiverRegistered = true;
@@ -1377,6 +1419,10 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
                     args.putString("handle", attributeMap.get(EXTRA_CALL_NUMBER));
                     args.putString("callUUID", attributeMap.get(EXTRA_CALL_UUID));
                     args.putString("output", attributeMap.get("output"));
+                    CallAudioState audioState = intent.getParcelableExtra(EXTRA_CALL_AUDIO_STATE);
+                    if (audioState != null) {
+                        putAudioState(args, audioState);
+                    }
                     sendEventToJS("RNCallKeepDidChangeAudioRoute", args);
                     break;
             }
