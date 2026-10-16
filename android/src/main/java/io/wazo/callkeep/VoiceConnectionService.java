@@ -26,6 +26,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Activity;
 import android.app.Service;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.Intent;
 import android.content.Context;
@@ -38,6 +39,7 @@ import android.os.Looper;
 import android.speech.tts.Voice;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.telecom.CallAudioState;
 import android.telecom.Connection;
@@ -72,7 +74,6 @@ import static io.wazo.callkeep.Constants.EXTRA_CALL_NUMBER_SCHEMA;
 import static io.wazo.callkeep.Constants.EXTRA_CALL_UUID;
 import static io.wazo.callkeep.Constants.EXTRA_SELF_MANAGED;
 import static io.wazo.callkeep.Constants.EXTRA_DISABLE_ADD_CALL;
-import static io.wazo.callkeep.Constants.FOREGROUND_SERVICE_TYPE_MICROPHONE;
 import static io.wazo.callkeep.Constants.ACTION_ON_CREATE_CONNECTION_FAILED;
 import static io.wazo.callkeep.Constants.ACTION_ON_CALL_ACTION_FAILED;
 
@@ -350,10 +351,36 @@ public class VoiceConnectionService extends ConnectionService {
 
         Notification notification = notificationBuilder.build();
 
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            try {
+                startForeground(ForegroundServiceTypes.NOTIFICATION_ID, notification);
+            } catch (Exception e) {
+                Log.w(TAG, "[VoiceConnectionService] Can't start foreground service : " + e.toString());
+            }
+            return;
+        }
+
+        int[] candidates = ForegroundServiceTypes.candidates(Build.VERSION.SDK_INT, declaredForegroundServiceTypes(),
+            permission -> ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED);
+        for (int type : candidates) {
+            try {
+                startForeground(ForegroundServiceTypes.NOTIFICATION_ID, notification, type);
+                Log.d(TAG, "[VoiceConnectionService] foreground service started, type: " + type);
+                return;
+            } catch (Exception e) {
+                Log.w(TAG, "[VoiceConnectionService] Can't start foreground service with type " + type + " : " + e.toString());
+            }
+        }
+    }
+
+    /** The foregroundServiceType the app's manifest declares for this service (API 29+), 0 if none. */
+    private int declaredForegroundServiceTypes() {
         try {
-            startForeground(FOREGROUND_SERVICE_TYPE_MICROPHONE, notification);
+            return getPackageManager().getServiceInfo(new ComponentName(this, VoiceConnectionService.class), 0)
+                .getForegroundServiceType();
         } catch (Exception e) {
-            Log.w(TAG, "[VoiceConnectionService] Can't start foreground service : " + e.toString());
+            Log.w(TAG, "[VoiceConnectionService] Can't read the declared foreground service type : " + e.toString());
+            return 0;
         }
     }
 

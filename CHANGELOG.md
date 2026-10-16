@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.4.0-signalwire.1 (fork, unreleased)
+
+Fixes for open upstream issues and pull requests, on top of 4.4.0-signalwire.0.
+
+### Fixes
+
+- Android 14+: the call's foreground service starts with only the declared types the app may use (`phoneCall`, `microphone`, `camera`, each with its `FOREGROUND_SERVICE_*` permission and runtime permission), then without `microphone`/`camera` if that start is refused. It used `startForeground(FOREGROUND_SERVICE_TYPE_MICROPHONE, notification)`: the type constant was the notification id, and every declared type applied, so the documented `camera|microphone` in an app without the CAMERA grant refused the whole start and the microphone went silent with the screen locked ([#827](https://github.com/react-native-webrtc/react-native-callkeep/issues/827)).
+
+### Behaviour changes
+
+- Android: the ongoing-call notification's id is now `0x43414c4c` (was 128).
+
 ## 4.4.0-signalwire.0 (fork, unreleased)
 
 A maintained fork of [react-native-callkeep](https://github.com/react-native-webrtc/react-native-callkeep) (ISC, The CallKeep
