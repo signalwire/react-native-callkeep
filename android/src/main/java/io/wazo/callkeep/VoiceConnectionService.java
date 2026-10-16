@@ -167,6 +167,7 @@ public class VoiceConnectionService extends ConnectionService {
         if (currentConnections.isEmpty()) {
             Log.d(TAG, "[VoiceConnectionService] deinitConnection. No other connections left -> RUN stopForegroundService!");
             currentConnectionService.stopForegroundService();
+            LockScreen.release();
         } else {
             Log.d(TAG, "[VoiceConnectionService] deinitConnection. There still exist other connections -> NO stopForegroundService!");
         }

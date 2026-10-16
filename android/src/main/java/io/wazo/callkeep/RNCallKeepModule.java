@@ -19,6 +19,7 @@ package io.wazo.callkeep;
 import com.facebook.react.bridge.LifecycleEventListener;
 import android.Manifest;
 import android.app.Activity;
+import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -37,7 +38,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.HandlerThread;
-import android.view.WindowManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -1255,15 +1255,14 @@ public class RNCallKeepModule extends ReactContextBaseJavaModule implements Life
         boolean isOpened = activity != null;
         Log.d(TAG, "[RNCallKeepModule] backToForeground, app isOpened ?" + (isOpened ? "true" : "false"));
 
+        // Over the lock screen until the calls end. These are the activity's
+        // window flags; they used to be added to the Intent's flags (#779, #667).
+        focusIntent.addFlags(LockScreen.launchFlags(isOpened));
         if (isOpened) {
-            focusIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            LockScreen.show(activity);
             activity.startActivity(focusIntent);
         } else {
-            focusIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK +
-                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED +
-                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD +
-                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-
+            LockScreen.showNextActivity((Application) context.getApplicationContext());
             getReactApplicationContext().startActivity(focusIntent);
         }
     }
