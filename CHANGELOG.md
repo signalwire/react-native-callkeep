@@ -1,6 +1,20 @@
 # Changelog
 
-## 4.4.0-signalwire.1 (fork, unreleased)
+## 4.4.0
+
+The first npm release of the fork, as **`@signalwire/react-native-callkeep`**.
+It contains everything in 4.4.0-signalwire.0 and 4.4.0-signalwire.1 below
+(those were git-only pre-releases, never on npm); there are no code changes
+beyond them.
+
+### Packaging
+
+- Package name `@signalwire/react-native-callkeep` (was `react-native-callkeep`). Imports change to `'@signalwire/react-native-callkeep'`; the JS API, the `RNCallKeep` native module and pod, and the `io.wazo.callkeep` Android package are unchanged. See "Migrating from `react-native-callkeep`" in the README.
+- `repository`, `bugs` and `homepage` (and so the podspec's `source`/`homepage`) point at [signalwire/react-native-callkeep](https://github.com/signalwire/react-native-callkeep).
+- A `files` allowlist: the tarball holds only the JS, types, Android and iOS sources, the podspec, the privacy manifest, LICENSE, AUTHORS, README and CHANGELOG.
+- `prepublishOnly` runs the Jest suite.
+
+## 4.4.0-signalwire.1 (git pre-release, part of 4.4.0)
 
 Fixes for open upstream issues and pull requests, on top of 4.4.0-signalwire.0.
 
@@ -27,13 +41,13 @@ Fixes for open upstream issues and pull requests, on top of 4.4.0-signalwire.0.
 - Android: after `backToForeground()` the app shows over the lock screen while a call is up (it was meant to; the flags never applied). It stops when the last call ends, or 30 s after a `backToForeground()` with no call. Starting the activity from the background is still subject to Android 10+'s background-activity-start limits.
 - Android: the ongoing-call notification's id is now `0x43414c4c` (was 128).
 
-## 4.4.0-signalwire.0 (fork, unreleased)
+## 4.4.0-signalwire.0 (git pre-release, part of 4.4.0)
 
 A maintained fork of [react-native-callkeep](https://github.com/react-native-webrtc/react-native-callkeep) (ISC, The CallKeep
 Authors; see `LICENSE` and `AUTHORS`), based on upstream `master`
 `71f80cb` (2026-09-14). npm `latest` upstream is 4.3.16; everything below
-4.3.16 that is on upstream master is included. The package name is still
-`react-native-callkeep`; it is not published to npm.
+4.3.16 that is on upstream master is included. At this pre-release the package
+name was still `react-native-callkeep` and it was not on npm.
 
 ### From upstream master since 4.3.16 (unreleased upstream)
 
