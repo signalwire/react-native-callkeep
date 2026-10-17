@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "es2020",
+    "types": [],
+    "skipLibCheck": false,
+    "paths": { "@signalwire/react-native-callkeep": ["../../index.d.ts"] }
+  },
+  "files": ["consumer.ts"]
+}

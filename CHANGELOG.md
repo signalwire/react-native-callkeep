@@ -12,7 +12,11 @@ beyond them.
 - Package name `@signalwire/react-native-callkeep` (was `react-native-callkeep`). Imports change to `'@signalwire/react-native-callkeep'`; the JS API, the `RNCallKeep` native module and pod, and the `io.wazo.callkeep` Android package are unchanged. See "Migrating from `react-native-callkeep`" in the README.
 - `repository`, `bugs` and `homepage` (and so the podspec's `source`/`homepage`) point at [signalwire/react-native-callkeep](https://github.com/signalwire/react-native-callkeep).
 - A `files` allowlist: the tarball holds only the JS, types, Android and iOS sources, the podspec, the privacy manifest, LICENSE, AUTHORS, README and CHANGELOG.
-- `prepublishOnly` runs the Jest suite.
+- `prepublishOnly` runs the Jest suite and `test:types`.
+
+### Fixes
+
+- TypeScript: `index.d.ts` is a module. It was an ambient `declare module 'react-native-callkeep'`, which types only that name; importing `'@signalwire/react-native-callkeep'` failed with TS2306 ("is not a module"). `npm run test:types` type-checks an import by the package name.
 
 ## 4.4.0-signalwire.1 (git pre-release, part of 4.4.0)
 
