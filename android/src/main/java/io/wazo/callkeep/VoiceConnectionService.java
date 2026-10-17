@@ -329,9 +329,17 @@ public class VoiceConnectionService extends ConnectionService {
             .setPriority(NotificationManager.IMPORTANCE_MIN)
             .setCategory(Notification.CATEGORY_SERVICE);
 
-        Activity currentActivity = RNCallKeepModule.instance.getCurrentReactActivity();
-        if (currentActivity != null) {
-            Intent notificationIntent = new Intent(this, currentActivity.getClass());
+        // The current activity, else the launcher's: a call can outlive its
+        // activity (endCallsOnHostDestroy: false), and a notification built
+        // for a call started then must still open the app.
+        Activity currentActivity = RNCallKeepModule.instance != null ? RNCallKeepModule.instance.getCurrentReactActivity() : null;
+        Intent launch = getPackageManager().getLaunchIntentForPackage(getPackageName());
+        String contentActivity = OngoingCallNotification.contentActivity(
+            currentActivity != null ? currentActivity.getClass().getName() : null,
+            launch != null && launch.getComponent() != null ? launch.getComponent().getClassName() : null);
+        if (contentActivity != null) {
+            Intent notificationIntent = new Intent();
+            notificationIntent.setClassName(this, contentActivity);
             notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
             final int flag =  Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE : PendingIntent.FLAG_UPDATE_CURRENT;

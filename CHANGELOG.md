@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.4.1
+
+### Fixes
+
+- Android: the ongoing-call notification opens the app's launcher activity when no React activity exists. With `endCallsOnHostDestroy: false` a call outlives its activity (Back on the root screen); the notification rebuilt for a call that started then had no content intent, so tapping it did nothing.
+
 ## 4.4.0
 
 The first npm release of the fork, as **`@signalwire/react-native-callkeep`**.
