@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "test:android": "bash tests/android/compile.sh",
-    "test:ios": "bash tests/ios/syntax-check.sh"
+    "test:ios": "bash tests/ios/syntax-check.sh",
+    "prepublishOnly": "npm test"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,22 @@
   },
   "homepage": "https://github.com/signalwire/react-native-callkeep#readme",
   "typings": "./index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "actions.js",
+    "android/build.gradle",
+    "android/src/main/AndroidManifest.xml",
+    "android/src/main/java/",
+    "ios/RNCallKeep/",
+    "ios/RNCallKeep.xcodeproj/project.pbxproj",
+    "ios/PrivacyInfo.xcprivacy",
+    "RNCallKeep.podspec",
+    "LICENSE",
+    "AUTHORS",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "peerDependencies": {
     "react-native": ">=0.40.0"
   },
