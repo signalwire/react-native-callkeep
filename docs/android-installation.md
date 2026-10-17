@@ -3,7 +3,7 @@
 ## Automatic linking
 
 ```sh
-react-native link react-native-callkeep
+react-native link @signalwire/react-native-callkeep
 ```
 
 ## Manual installation
@@ -16,7 +16,7 @@ Add:
 
 ```java
 include ':react-native-callkeep'
-project(':react-native-callkeep').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-callkeep/android')
+project(':react-native-callkeep').projectDir = new File(rootProject.projectDir, '../node_modules/@signalwire/react-native-callkeep/android')
 ```
 
 3. In `android/app/src/main/java/.../MainApplication.java`:

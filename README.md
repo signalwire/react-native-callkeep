@@ -1,9 +1,9 @@
 # React Native CallKeep
 
-> **Fork.** This branch (`signalwire/main` of signalwire/react-native-callkeep) is a maintained fork of [react-native-webrtc/react-native-callkeep](https://github.com/react-native-webrtc/react-native-callkeep), ISC-licensed by The CallKeep Authors. See [CHANGELOG.md](CHANGELOG.md) for what it adds.
+> **`@signalwire/react-native-callkeep` is the SignalWire-maintained fork** of [react-native-webrtc/react-native-callkeep](https://github.com/react-native-webrtc/react-native-callkeep) (ISC, The CallKeep Authors; see [LICENSE](LICENSE) and [AUTHORS](AUTHORS)). It is upstream `master` plus open upstream fixes and pull requests: among them the Android New Architecture crash at launch, foreground-service types on Android 14+, `setup()` on devices without Telecom, and audio-route selection. The JS API is the same as upstream's. See [CHANGELOG.md](CHANGELOG.md) for everything it adds. Source: [signalwire/react-native-callkeep](https://github.com/signalwire/react-native-callkeep), branch `signalwire/main`.
 
-[![npm version](https://badge.fury.io/js/react-native-callkeep.svg)](https://badge.fury.io/js/react-native-callkeep)
-[![npm downloads](https://img.shields.io/npm/dm/react-native-callkeep.svg?maxAge=2592000)](https://img.shields.io/npm/dm/react-native-callkeep.svg?maxAge=2592000)
+[![npm version](https://img.shields.io/npm/v/@signalwire/react-native-callkeep.svg)](https://www.npmjs.com/package/@signalwire/react-native-callkeep)
+[![npm downloads](https://img.shields.io/npm/dm/@signalwire/react-native-callkeep.svg?maxAge=2592000)](https://www.npmjs.com/package/@signalwire/react-native-callkeep)
 
 **React Native CallKeep** utilises a brand new iOS 10 framework **CallKit** and Android **ConnectionService** to make the life easier for VoIP developers using React Native.
 
@@ -31,7 +31,7 @@ For more information about **ConnectionService** on Android, please see [Android
 
 
 # Demo
-A demo of `react-native-callkeep` is available in the [wazo-react-native-demo](https://github.com/wazo-pbx/wazo-react-native-demo) repository.
+A demo of upstream `react-native-callkeep` is available in the [wazo-react-native-demo](https://github.com/wazo-pbx/wazo-react-native-demo) repository.
 
 #### Android
 ![Connection Service](docs/pictures/connection-service.jpg)
@@ -41,20 +41,30 @@ A demo of `react-native-callkeep` is available in the [wazo-react-native-demo](h
 
 # Installation
 ```sh
-npm install --save react-native-callkeep
+npm install --save @signalwire/react-native-callkeep
 # or
-yarn add react-native-callkeep
+yarn add @signalwire/react-native-callkeep
 ```
 
-- [iOS](docs/ios-installation.md)
-- [Android](docs/android-installation.md)
+React Native 0.60+ autolinks it on both platforms (the CocoaPods pod is still `RNCallKeep`; the Android classes are still `io.wazo.callkeep`). Run `pod install` in `ios/` after installing. Manual linking: [iOS](docs/ios-installation.md), [Android](docs/android-installation.md).
+
+### Migrating from `react-native-callkeep`
+
+Only the package name changes; the JS API, the native module, the pod and the Android package are the same.
+
+1. `npm uninstall react-native-callkeep && npm install @signalwire/react-native-callkeep`
+2. Change every import: `from 'react-native-callkeep'` becomes `from '@signalwire/react-native-callkeep'` (and the same for `require`, and Jest mocks such as `jest.mock('react-native-callkeep')`).
+3. Manually linked apps only: change `node_modules/react-native-callkeep` to `node_modules/@signalwire/react-native-callkeep` in the `Podfile` and `settings.gradle`.
+4. `cd ios && pod install`, then rebuild both apps.
+
+Read the behaviour changes in [CHANGELOG.md](CHANGELOG.md) before upgrading: for example `setAudioRoute` can now reject where it hung, and on Android the process is no longer killed when the activity is destroyed.
 
 # Usage
 
 #### Setup
 
 ```js
-import RNCallKeep from 'react-native-callkeep';
+import RNCallKeep from '@signalwire/react-native-callkeep';
 
 const options = {
   ios: {
@@ -185,7 +195,7 @@ const CONSTANTS = {
   }
 };
 
-const { CONSTANTS as CK_CONSTANTS, RNCallKeep } from 'react-native-callkeep';
+const { CONSTANTS as CK_CONSTANTS, RNCallKeep } from '@signalwire/react-native-callkeep';
 
 console.log(CK_CONSTANTS.END_CALL_REASONS.FAILED) // outputs 1
 ```
@@ -511,7 +521,7 @@ RNCallKeep.reportEndCallWithUUID(uuid, reason);
     - Missed: 6 (on iOS this will map to remote user ended call)
   - Access reasons as constants
   ```js
-  const { CONSTANTS as CK_CONSTANTS, RNCallKeep } from 'react-native-callkeep';
+  const { CONSTANTS as CK_CONSTANTS, RNCallKeep } from '@signalwire/react-native-callkeep';
 
   RNCallKeep.reportEndCallWithUUID(uuid, CK_CONSTANTS.END_CALL_REASONS.FAILED);
   ```
@@ -1084,11 +1094,11 @@ RNCallKeep.addEventListener('onHasActiveCall', () => {
 
 ## Example
 
-A full example is available in the [example](https://github.com/react-native-webrtc/react-native-callkeep/tree/master/example) folder.
+A full example is available in the [example](https://github.com/signalwire/react-native-callkeep/tree/signalwire/main/example) folder.
 
 ```javascript
 import React from 'react';
-import RNCallKeep from 'react-native-callkeep';
+import RNCallKeep from '@signalwire/react-native-callkeep';
 import uuid from 'uuid';
 
 class RNCallKeepExample extends React.Component {

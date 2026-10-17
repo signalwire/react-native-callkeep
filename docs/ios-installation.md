@@ -3,7 +3,7 @@
 ## Automatic linking
 
 ```sh
-react-native link react-native-callkeep
+react-native link @signalwire/react-native-callkeep
 ```
 
 ## Installation with Cocoa pods
@@ -11,7 +11,7 @@ react-native link react-native-callkeep
 Include in a Podfile in your react-native `ios` directory:
 
 ```
-pod 'RNCallKeep', :path => '../node_modules/react-native-callkeep'
+pod 'RNCallKeep', :path => '../node_modules/@signalwire/react-native-callkeep'
 ```
 
 Then:
@@ -28,7 +28,7 @@ pod install
 
 ![iOS Add Library](pictures/ios-add-library.png)
 
-1.2. Choose `node_modules/react-native-callkeep/ios/RNCallKeep.xcodeproj` then click `Add`.
+1.2. Choose `node_modules/@signalwire/react-native-callkeep/ios/RNCallKeep.xcodeproj` then click `Add`.
 
 ![iOS Select Library](pictures/ios-select-library.png)
 
@@ -60,7 +60,7 @@ You'll now have the Library included.
 
 2.1. Click on `Build Settings` tab, then search for `Header Search Paths`.
 
-2.2. Add `$(SRCROOT)/../node_modules/react-native-callkeep/ios/RNCallKeep`.
+2.2. Add `$(SRCROOT)/../node_modules/@signalwire/react-native-callkeep/ios/RNCallKeep`.
 
 ![iOS Search Paths](pictures/ios-search-paths.png)
 
